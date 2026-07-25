@@ -14,7 +14,7 @@ env:
   ITS_IMDB_LISTS: ${{ vars.IMDB_LISTS }}
   ITS_IMDB_IGNOREDLISTS: ${{ vars.IMDB_IGNOREDLISTS }}
   ITS_IMDB_TRACE: ${{ vars.IMDB_TRACE }}
-  ITS_IMDB_HEADLESS: true
+  ITS_IMDB_HEADLESS: false
   ITS_IMDB_BROWSERPATH: ${{ github.workspace }}/chrome-linux/chrome
   ITS_SYNC_MODE: ${{ vars.SYNC_MODE }}
   ITS_SYNC_HISTORY: ${{ vars.SYNC_HISTORY }}
@@ -41,6 +41,8 @@ jobs:
           echo "Google Chrome binary not found at $ITS_IMDB_BROWSERPATH"
           exit 1
         fi
+    - name: Install xvfb
+      run: sudo apt-get update && sudo apt-get install -y xvfb
     - name: Setup Go
       uses: actions/setup-go@v6
       with:
@@ -57,7 +59,7 @@ jobs:
           echo "no TRAKT_TOKEN secret set; sync will print device authorization instructions, wait for manual auth and fail if unattended"
         fi
     - name: Sync
-      run: make sync
+      run: xvfb-run -a make sync
     # Trakt rotates the refresh token every 7 days, so the token file
     # written by Sync (if any) must be written back to the repository
     # secret, or the next scheduled run will require manual intervention.
