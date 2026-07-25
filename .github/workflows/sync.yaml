@@ -15,7 +15,7 @@ env:
   ITS_IMDB_IGNOREDLISTS: ${{ vars.IMDB_IGNOREDLISTS }}
   ITS_IMDB_TRACE: ${{ vars.IMDB_TRACE }}
   ITS_IMDB_HEADLESS: false
-  ITS_IMDB_BROWSERPATH: ${{ github.workspace }}/chrome-linux/chrome
+  ITS_IMDB_BROWSERPATH: /usr/bin/google-chrome
   ITS_SYNC_MODE: ${{ vars.SYNC_MODE }}
   ITS_SYNC_HISTORY: ${{ vars.SYNC_HISTORY }}
   ITS_SYNC_RATINGS: ${{ vars.SYNC_RATINGS }}
@@ -31,12 +31,11 @@ jobs:
     steps:
     - name: Check out code
       uses: actions/checkout@v5
-    - name: Install Google Chrome
+    - name: Verify Google Chrome
       run: |
-        wget -q https://storage.googleapis.com/chromium-browser-snapshots/Linux_x64/1321438/chrome-linux.zip
-        unzip -q chrome-linux.zip
-        if test -f "$ITS_IMDB_BROWSERPATH"; then
-          echo "Google Chrome binary stored at $ITS_IMDB_BROWSERPATH"
+        if test -x "$ITS_IMDB_BROWSERPATH"; then
+          "$ITS_IMDB_BROWSERPATH" --version
+          echo "Using preinstalled Google Chrome at $ITS_IMDB_BROWSERPATH"
         else
           echo "Google Chrome binary not found at $ITS_IMDB_BROWSERPATH"
           exit 1
